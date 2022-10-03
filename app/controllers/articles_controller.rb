@@ -7,8 +7,18 @@ class ArticlesController < ApplicationController
   end
 
   def show
-    article = Article.find(params[:id])
-    render json: article
+    session[:page_views] ||= 0
+    if session[:page_views].to_i < 3
+      article = Article.find(params[:id])
+      session[:page_views] = session[:page_views].to_i + 1
+      render json: article
+    else
+      render json: {
+        status: 401,
+        message: "You need to be logged in to view extra pages"
+      }, status: :unauthorized
+    end
+
   end
 
   private
